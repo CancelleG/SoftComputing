@@ -62,8 +62,8 @@ def fit(X, Y, learningrate=0.2, hiddenNumber=2, rounds=1000):
 
 
                 Ek = 0
-                # for l in range(outputy.y.shape[1]-1):
-                Ek += (outputy.y[0,l] - Y[k,l]) * (outputy.y[0,l] - Y[k,l])
+                for l in range(outputy.y.shape[1]-1):
+                    Ek += (outputy.y[0,l] - Y[k,l]) * (outputy.y[0,l] - Y[k,l])
                 Ek = 1/2*Ek             #????算出来干什么
                 print(Ek)
 
@@ -154,19 +154,25 @@ def getData():
 
 
 if __name__ == '__main__':
-    X, Y, pre_X, pre_Y = getData()
-    print(Y)
-    inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 1000)
-    pre_right = 0
-    pre_wrong = 0
-    for index in range(pre_X.shape[0]):
-        preout = predict(pre_X[index], inputx, hiddenb, outputy)
-        if preout == [i for i in pre_Y[index]]:
-            prejudge = 1
-            pre_right += 1
-        else:
-            prejudge = 0
-            pre_wrong += 1
-        print("predict X:",pre_X[index],"value: ", preout , "judge:", prejudge)
-    acc = pre_right/(pre_right + pre_wrong)
-    print("Acuuracy:",acc)
+    acc = []
+    for i in range(20):
+        X, Y, pre_X, pre_Y = getData()
+        print(Y)
+        inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 1000)
+        pre_right = 0
+        pre_wrong = 0
+        for index in range(pre_X.shape[0]):
+            preout = predict(pre_X[index], inputx, hiddenb, outputy)
+            if preout == [i for i in pre_Y[index]]:
+                prejudge = 1
+                pre_right += 1
+            else:
+                prejudge = 0
+                pre_wrong += 1
+            print("predict X:",pre_X[index],"value: ", preout , "judge:", prejudge)
+        acc.append(pre_right/(pre_right + pre_wrong))
+    sum = 0
+    for i in acc:
+        sum += i
+    sum = sum/len(acc)
+    print("Acuuracy:",sum)
