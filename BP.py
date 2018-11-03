@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import classification_report
 
 def sigmoid(x):
     f = 1/(1+np.exp(-x))
@@ -150,29 +151,44 @@ def getData():
             pre_Y_onehot[i, 1] = 1
         else:
             pre_Y_onehot[i, 2] = 1
-    return X, Y_onehot, pre_X, pre_Y_onehot
+    return X, Y_onehot, pre_X, pre_Y_onehot,pre_Y
+
+def onehot2num(Y_onehot):
+    Y_num = []
+    # for i in range(len(Y_onehot)):
+    if Y_onehot[0] == 0:
+        Y_num.append(0)
+    elif Y_onehot[1] == 1:
+        Y_num.append(1)
+    else:
+        Y_num.append(2)
+    return Y_num
 
 
 if __name__ == '__main__':
     acc = []
-    for i in range(20):
-        X, Y, pre_X, pre_Y = getData()
+    for i in range(1):
+        X, Y, pre_X, true_Y_onehot, true_Y = getData()
         print(Y)
-        inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 1000)
+        inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 10)
         pre_right = 0
         pre_wrong = 0
+        preout_list = []
         for index in range(pre_X.shape[0]):
             preout = predict(pre_X[index], inputx, hiddenb, outputy)
-            if preout == [i for i in pre_Y[index]]:
-                prejudge = 1
-                pre_right += 1
-            else:
-                prejudge = 0
-                pre_wrong += 1
-            print("predict X:",pre_X[index],"value: ", preout , "judge:", prejudge)
-        acc.append(pre_right/(pre_right + pre_wrong))
-    sum = 0
-    for i in acc:
-        sum += i
-    sum = sum/len(acc)
-    print("Acuuracy:",sum)
+            # if preout == [i for i in pre_Y[index]]:
+            #     prejudge = 1
+            #     pre_right += 1
+            # else:
+            #     prejudge = 0
+            #     pre_wrong += 1
+            # print("predict X:",pre_X[index],"value: ", preout , "judge:", prejudge)
+            pre_Y = onehot2num(preout)
+            preout_list.extend(pre_Y)
+        # acc.append(pre_right/(pre_right + pre_wrong))
+        print(classification_report([true_Y[0,i] for i in range(true_Y.shape[1])], preout_list))
+    # sum = 0
+    # for i in acc:
+    #     sum += i
+    # sum = sum/len(acc)
+    # print("Acuuracy:", sum)
