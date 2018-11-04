@@ -156,7 +156,7 @@ def getData():
 def onehot2num(Y_onehot):
     Y_num = []
     # for i in range(len(Y_onehot)):
-    if Y_onehot[0] == 0:
+    if Y_onehot[0] == 1:
         Y_num.append(0)
     elif Y_onehot[1] == 1:
         Y_num.append(1)
@@ -170,7 +170,7 @@ if __name__ == '__main__':
     for i in range(1):
         X, Y, pre_X, true_Y_onehot, true_Y = getData()
         print(Y)
-        inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 10)
+        inputx, hiddenb, outputy = fit(X, Y, 0.01, 10, 100)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
@@ -186,7 +186,9 @@ if __name__ == '__main__':
             pre_Y = onehot2num(preout)
             preout_list.extend(pre_Y)
         # acc.append(pre_right/(pre_right + pre_wrong))
-        print(classification_report([true_Y[0,i] for i in range(true_Y.shape[1])], preout_list))
+        target_names = ['class 0', 'class 1', 'class 2']
+        true_Y_list = [true_Y[0, i] for i in range(true_Y.shape[1])]
+        print(classification_report(true_Y_list, preout_list, target_names=target_names))
     # sum = 0
     # for i in acc:
     #     sum += i
