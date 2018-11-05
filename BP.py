@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import MinMaxScaler
-
+average_epochs = []
 def sigmoid(x):
     f = 1/(1+np.exp(-x))
     return f
@@ -99,6 +99,7 @@ def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=
                 Per_e_count += 1
             if(Per_e_count == 2): break
         print("epochs :", len(dj_all))
+        average_epochs.append(len(dj_all))
         plt.figure()
         plt.plot(list(range(len(dj_all))), dj_all)
         # plt.show()
@@ -179,7 +180,7 @@ if __name__ == '__main__':
         X, Y, pre_X, true_Y = getData()
         hiddennumber = [10]           #在这里输入每层的节点数
                                  # 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
-        inputx, hiddenb, outputy = fit(X,     Y,  0.01,   1e-5,          hiddennumber,           5000)
+        inputx, hiddenb, outputy = fit(X,     Y,  0.01,   1e-7,          hiddennumber,           5000)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
@@ -189,5 +190,5 @@ if __name__ == '__main__':
             preout_list.extend(pre_Y)
         # acc.append(pre_right/(pre_right + pre_wrong))
         target_names = ['class 0', 'class 1', 'class 2']
-
         print(classification_report(true_Y, preout_list, target_names=target_names))
+        print("average_epochs:", average_epochs / len(average_epochs))
