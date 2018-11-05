@@ -37,8 +37,8 @@ class outputLayer:
         self.bias_theta = np.mat(self.bias_theta)
         self.y = []
 
-#输入测试集，标签，学习率，隐藏层数目及每层节点数（输入列表），循环次数，
-def fit(X, Y, learningrate=0.2, hiddenNumber=[5], epochs=1000):
+#输入测试集，标签，学习率，最大误差， 隐藏层数目及每层节点数（输入列表），循环次数
+def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=1000):
         inputNumber = X.shape[1]
         ouputNumber = Y.shape[1]            #看Y是几维的
         layernode = [inputNumber, hiddenNumber, ouputNumber]
@@ -93,7 +93,7 @@ def fit(X, Y, learningrate=0.2, hiddenNumber=[5], epochs=1000):
             dj_sub = 0
             for num in dj:
                 dj_sub += num
-            if dj_sub/len(dj) < 0.01: break
+            if dj_sub/len(dj) < Permitted_error: break
             dj_all.append(dj_sub/len(dj))
         plt.figure()
         plt.plot(list(range(epochs)), dj_all)
@@ -173,8 +173,9 @@ if __name__ == '__main__':
     acc = []
     for i in range(1):      #设置测试次数
         X, Y, pre_X, true_Y = getData()
-        hiddennumber = [3,3]           #在这里输入每层的节点数
-        inputx, hiddenb, outputy = fit(X, Y, 0.01, hiddennumber, 2000)
+        hiddennumber = [5]           #在这里输入每层的节点数
+                                 # 输入测试集，标签，学习率，最大误差， 隐藏层数目及每层节点数（输入列表），循环次数，
+        inputx, hiddenb, outputy = fit(X,     Y,  0.01,  0.01,          hiddennumber,           10000)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
