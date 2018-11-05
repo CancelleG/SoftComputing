@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.neural_network import MLPClassifier
+
 average_epochs = []
 def sigmoid(x):
     f = 1/(1+np.exp(-x))
@@ -162,7 +164,7 @@ def getData():
             Y_onehot[i, 1] = 1
         else:
             Y_onehot[i, 2] = 1
-    return X, Y_onehot, pre_X, pre_Y
+    return X, np.mat(Y_list),Y_onehot, pre_X, pre_Y
 
 def onehot2num(Y_onehot):
     Y_num = []
@@ -176,11 +178,11 @@ def onehot2num(Y_onehot):
 
 if __name__ == '__main__':
     acc = []
-    for i in range(5):      #设置测试次数
-        X, Y, pre_X, true_Y = getData()
-        hiddennumber = [10]           #在这里输入每层的节点数
+    for i in range(1):      #设置测试次数
+        X, Y, Y_onehot, pre_X, true_Y = getData()
+        hiddennumber = [15]          #在这里输入每层的节点数
                                  # 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
-        inputx, hiddenb, outputy = fit(X,     Y,  0.01,   1e-7,          hiddennumber,           5000)
+        inputx, hiddenb, outputy = fit(X,     Y_onehot,  0.01,   1e-5,          hiddennumber,           3000)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
@@ -191,7 +193,9 @@ if __name__ == '__main__':
         # acc.append(pre_right/(pre_right + pre_wrong))
         target_names = ['class 0', 'class 1', 'class 2']
         print(classification_report(true_Y, preout_list, target_names=target_names))
-        average_epochs_val = 0
-        for i in average_epochs:
-            average_epochs_val += i
-        print("average_epochs:", average_epochs_val / len(average_epochs))
+    average_epochs_val = 0
+    for i in average_epochs:
+        average_epochs_val += i
+    print("average_epochs:", average_epochs_val / len(average_epochs))
+    clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=3000)
+    clf.fit(X, Y)
