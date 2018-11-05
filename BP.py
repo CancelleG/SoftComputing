@@ -191,4 +191,7 @@ if __name__ == '__main__':
         # acc.append(pre_right/(pre_right + pre_wrong))
         target_names = ['class 0', 'class 1', 'class 2']
         print(classification_report(true_Y, preout_list, target_names=target_names))
-        print("average_epochs:", average_epochs / len(average_epochs))
+        average_epochs_val = 0
+        for i in average_epochs:
+            average_epochs_val += i
+        print("average_epochs:", average_epochs_val / len(average_epochs))
