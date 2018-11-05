@@ -37,7 +37,7 @@ class outputLayer:
         self.bias_theta = np.mat(self.bias_theta)
         self.y = []
 
-#输入测试集，标签，学习率，最大误差， 隐藏层数目及每层节点数（输入列表），循环次数
+# 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
 def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=1000):
         inputNumber = X.shape[1]
         ouputNumber = Y.shape[1]            #看Y是几维的
@@ -48,6 +48,7 @@ def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=
             hiddenb.append(hiddenLayer(layernode, n))
         outputy = outputLayer(layernode)
         dj_all = []
+        Per_e_count = 0     #记录连续两次小于误差
         for epoch in range(epochs):
 
             dj = []
@@ -93,11 +94,14 @@ def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=
             dj_sub = 0
             for num in dj:
                 dj_sub += num
-            if dj_sub/len(dj) < Permitted_error: break
-            dj_all.append(dj_sub/len(dj))
+            dj_all.append(dj_sub / len(dj))
+            if (len(dj_all)!=1 and abs(dj_all[-2] - dj_all[-1]) < Permitted_error):
+                Per_e_count += 1
+            if(Per_e_count == 2): break
+        print("epochs :", len(dj_all))
         plt.figure()
-        plt.plot(list(range(epochs)), dj_all)
-        plt.show()
+        plt.plot(list(range(len(dj_all))), dj_all)
+        # plt.show()
         return inputx,hiddenb,outputy
 
 
@@ -171,11 +175,11 @@ def onehot2num(Y_onehot):
 
 if __name__ == '__main__':
     acc = []
-    for i in range(1):      #设置测试次数
+    for i in range(5):      #设置测试次数
         X, Y, pre_X, true_Y = getData()
-        hiddennumber = [5]           #在这里输入每层的节点数
-                                 # 输入测试集，标签，学习率，最大误差， 隐藏层数目及每层节点数（输入列表），循环次数，
-        inputx, hiddenb, outputy = fit(X,     Y,  0.01,  0.01,          hiddennumber,           10000)
+        hiddennumber = [10]           #在这里输入每层的节点数
+                                 # 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
+        inputx, hiddenb, outputy = fit(X,     Y,  0.01,   1e-5,          hiddennumber,           5000)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
