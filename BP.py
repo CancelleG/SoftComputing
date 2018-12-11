@@ -5,6 +5,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.neural_network import MLPClassifier
 
 average_epochs = []
+error_curve = []
 def sigmoid(x):
     f = 1/(1+np.exp(-x))
     return f
@@ -40,10 +41,10 @@ class outputLayer:
         self.y = []
 
 # 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
-def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=1000):
+def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddennumber=[5], epochs=1000):
         inputNumber = X.shape[1]
         ouputNumber = Y.shape[1]            #看Y是几维的
-        layernode = [inputNumber, hiddenNumber, ouputNumber]
+        layernode = [inputNumber, hiddennumber, ouputNumber]
         inputx = inputLayer(layernode)
         hiddenb = []
         for n in range(len(hiddennumber)):
@@ -51,6 +52,12 @@ def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=
         outputy = outputLayer(layernode)
         dj_all = []
         Per_e_count = 0     #记录连续两次小于误差
+
+
+
+        plt.figure()
+
+
         for epoch in range(epochs):
 
             dj = []
@@ -92,19 +99,43 @@ def fit(X, Y, learningrate=0.2,Permitted_error = 0.001,hiddenNumber=[5], epochs=
                     else:
                         hiddenb[n].bias_gamma += -eta * eq1
                     eq0 = eq1
-                dj.append(Ek)
+                dj.append(Ek) #记录了所有的每个样本的均方误差
+            error_big = []  # 记录了误差大于允许误差的样本
+            for error in dj:
+                if error > 0.01:
+                    error_big.append(error)
+            if (epoch%100 == 0 and epoch>801 and epoch <1601):
+                plt.plot(list(range(len(error_big))), error_big, label="epoch:%d"%epoch)
+
             dj_sub = 0
             for num in dj:
                 dj_sub += num
-            dj_all.append(dj_sub / len(dj))
+            dj_all.append(dj_sub / len(dj))         #记录所有样本的每一次均方误差的平均值
+            if (len(dj_all) != 1):
+                error_curve.append(abs(dj_all[-2] - dj_all[-1]))        #记录来连续两次样本误差相见
             if (len(dj_all)!=1 and abs(dj_all[-2] - dj_all[-1]) < Permitted_error):
                 Per_e_count += 1
             if(Per_e_count == 2): break
+        plt.xlabel('epochs')
+        plt.ylabel('error')
+        plt.legend()
         print("epochs :", len(dj_all))
         average_epochs.append(len(dj_all))
         plt.figure()
         plt.plot(list(range(len(dj_all))), dj_all)
-        # plt.show()
+        plt.xlabel('epochs')
+        plt.ylabel('error')
+        plt.figure()
+        plt.plot(list(range(len(error_curve))), error_curve)
+        # error_big = []      #记录了误差大于允许误差的样本
+        # for error in dj:
+        #     if error > Permitted_error:
+        #         error_big.append(error)
+        # plt.figure()
+        # plt.plot(list(range(len(error_big))), error_big)
+        plt.xlabel('epochs')
+        plt.ylabel('error')
+        plt.show()
         return inputx,hiddenb,outputy
 
 
@@ -180,9 +211,9 @@ if __name__ == '__main__':
     acc = []
     for i in range(1):      #设置测试次数
         X, Y, Y_onehot, pre_X, true_Y = getData()
-        hiddennumber = [15]          #在这里输入每层的节点数
+        hiddennumber = [5]          #在这里输入每层的节点数
                                  # 输入测试集，标签，学习率，连续两次误差， 隐藏层数目及每层节点数（输入列表），循环次数，
-        inputx, hiddenb, outputy = fit(X,     Y_onehot,  0.01,   1e-5,          hiddennumber,           3000)
+        inputx, hiddenb, outputy = fit(X,     Y_onehot,  0.01,   1e-8,          hiddennumber,           200)
         pre_right = 0
         pre_wrong = 0
         preout_list = []
@@ -197,5 +228,6 @@ if __name__ == '__main__':
     for i in average_epochs:
         average_epochs_val += i
     print("average_epochs:", average_epochs_val / len(average_epochs))
-    clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=3000)
-    clf.fit(X, Y)
+    # clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(10, 5), random_state=1, max_iter=3000)
+    # clf.fit(X, Y.T.ravel())
+    # print(clf.score(pre_X, np.mat(true_Y).T))
