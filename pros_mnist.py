@@ -7,8 +7,8 @@ def main():
     x = tf.placeholder("float", shape=[None, 784])
     y_ = tf.placeholder("float", shape=[None, 10])
 
-    W = tf.Variable(tf.zeros([784, 10]))
-    b = tf.Variable(tf.zeros([10]))
+    # W = tf.Variable(tf.zeros([784, 10]))
+    # b = tf.Variable(tf.zeros([10]))
 
     sess.run(tf.initialize_all_variables())
     # y = tf.nn.softmax(tf.matmul(x, W) +b)
@@ -36,9 +36,10 @@ def main():
         return tf.nn.max_pool(x, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
 
 
-    W_conv1 = weight_variable([5,5,1,32])
+    W_conv1 = weight_variable([5,5,1,32])       #前两维为patch的大小，接着是输入的通道数目，最后是输出的通道数目
     b_conv1 = bias_variable([32])
-    x_image = tf.reshape(x, [-1,28,28,1])
+    x_image = tf.reshape(x, [-1,28,28,1])       #2、3维为图片的大小（宽和高），4维为通道数，
+                                                ############第一维是什么
     h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
     h_pool1 = max_pool_2x2(h_conv1)
 
@@ -71,7 +72,6 @@ def main():
                 x: batch[0], y_: batch[1], keep_prob: 1.0})
             print("step %d, training accuracy %g" % (step, train_accuracy))
         train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
-
     print("test accuracy:%g"%accuracy.eval(feed_dict={x: mnist.test.images, y_: mnist.test.labels,
                                                       keep_prob: 1.0}))
 
